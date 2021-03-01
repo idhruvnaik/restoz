@@ -64,4 +64,6 @@ angular.module('clmApp').controller('homeCtrl', ['$scope', '$state', function ($
     $(".button, a, button").mouseup(function () {
         $(this).blur();
     });
+
+    $('body').prepend('<a href="body" class="back-to-top page-scroll">Back to Top</a>');
 }]);

@@ -1643,7 +1643,6 @@ input[type='checkbox'] {
 /*     16. Contact     */
 /***********************/
 .form-2 {
-	padding-top: 6.625rem;
 	padding-bottom: 5.625rem;
 	background-color: #fbfbfb;
 }
@@ -1687,6 +1686,8 @@ input[type='checkbox'] {
 	margin-left: 0.125rem;
 	width: 3.25rem;
 	height: 3.25rem;
+	background-color: rgb(17, 52, 72);
+	border-radius: 50%;
 }
 
 .form-2 .fa-stack .hexagon {
