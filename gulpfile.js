@@ -34,7 +34,7 @@ function injectBower() {
         bowerJson: require("./bower.json"),
         directory: 'app/components'
     };
-    var target = src('app/account/index.html');
+    var target = src('app/index.html');
     return target.pipe(wiredep(options)).pipe(dest('app', { overwrite: true }));
 }
 
