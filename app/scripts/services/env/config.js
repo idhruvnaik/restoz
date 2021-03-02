@@ -1,5 +1,7 @@
 angular.module('config', ['templates'])
 
-.constant('ENV', {})
+.constant('ENV', {
+	'name': 'production'
+})
 
 ;
