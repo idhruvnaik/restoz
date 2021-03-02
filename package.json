@@ -3,9 +3,6 @@
   "version": "1.0.0",
   "description": "Restaurant App",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "author": "",
   "license": "ISC",
   "devDependencies": {
@@ -34,8 +31,20 @@
     "gulp-wiredep": "^1.2.0",
     "gulp-ng-templates": "^1.0.2",
     "gulp-uglify-es": "^2.0.0",
-    "gulp-concat": "^2.6.1"
+    "gulp-concat": "^2.6.1",
+    "modernizr": "^3.7.1",
+    "workbox-build": "^5.1.3"
   },
+  "scripts": {
+    "tasks": "gulp --tasks",
+    "start": "node server.js",
+    "build": "bower install && gulp build"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "Firefox ESR"
+  ],
   "eslintConfig": {
     "parserOptions": {
       "sourceType": "module"

@@ -1,10 +1,13 @@
 const { src, dest, series, parallel, watch, lastRun } = require('gulp');
+const fs = require('fs');
+const mkdirp = require('mkdirp');
 const gulpLoadPlugins = require('gulp-load-plugins');
 const $ = gulpLoadPlugins();
 
 const sass = require('gulp-sass');
 const autoprefixer = require('autoprefixer');
 const modRewrite = require('connect-modrewrite');
+const Modernizr = require('modernizr');
 const uglify = require('gulp-uglify');
 const gulpif = require('gulp-if');
 const cssnano = require('cssnano');
@@ -13,6 +16,7 @@ const browserSync = require('browser-sync');
 const ngtemplate = require('gulp-ng-templates');
 const uglifyEs = require('gulp-uglify-es').default;
 const del = require('del');
+const workboxBuild = require('workbox-build');
 const server = browserSync.create();
 const { argv } = require('yargs');
 const port = argv.port || 9000;
@@ -132,6 +136,83 @@ function concatTemplate() {
         .pipe(dest('dist/scripts'));
 }
 
+function serviceWorker() {
+    return workboxBuild.generateSW({
+        cacheId: require('./bower.json').name,
+        //        importWorkboxFrom: 'local',
+        globDirectory: 'dist',
+        globPatterns: [
+            '**\/*.{js,css,jpg,png,woff,ttf,svg,eot}'
+        ],
+        runtimeCaching: [{
+            urlPattern: new RegExp('^https://cdn\.tinymce\.com/'),
+            handler: 'StaleWhileRevalidate',
+            options: {
+                cacheableResponse: {
+                    statuses: [0, 200]
+                }
+            }
+        }, {
+            urlPattern: new RegExp('^https://fonts\.googleapis\.com/'),
+            handler: 'StaleWhileRevalidate',
+            options: {
+                cacheableResponse: {
+                    statuses: [0, 200]
+                }
+            }
+        }],
+        cleanupOutdatedCaches: true,
+        directoryIndex: 'index.html',
+        swDest: 'dist/service-worker.js',
+        //        clientsClaim: true,
+        skipWaiting: true,
+        maximumFileSizeToCacheInBytes: 3145728
+    }).then(({ count, size }) => {
+        console.log(`precache ${count} files, totaling ${size} bytes.`);
+    });
+}
+
+function extras() {
+    return src([
+        'app/*',
+        '!app/*.html'
+    ], {
+        dot: true
+    }).pipe(dest('dist'));
+}
+
+async function modernizr() {
+    const readConfig = () => new Promise((resolve, reject) => {
+        fs.readFile(`${__dirname}/modernizr.json`, 'utf8', (err, data) => {
+            if (err)
+                reject(err);
+            resolve(JSON.parse(data));
+        })
+    })
+    const createDir = () => new Promise((resolve, reject) => {
+        mkdirp(`${__dirname}/.tmp/scripts`, err => {
+            if (err)
+                reject(err);
+            resolve();
+        })
+    });
+    const generateScript = config => new Promise((resolve, reject) => {
+        Modernizr.build(config, content => {
+            fs.writeFile(`${__dirname}/.tmp/scripts/modernizr.js`, content, err => {
+                if (err)
+                    reject(err);
+                resolve(content);
+            });
+        })
+    });
+
+    const [config] = await Promise.all([
+        readConfig(),
+        createDir()
+    ]);
+    await generateScript(config);
+}
+
 const build = series(
     clean,
     injectBower,
@@ -139,10 +220,12 @@ const build = series(
     copyHtml,
     parallel(
         lint,
-        series(parallel(styles, scripts), html, concatTemplate),
-        images
+        series(parallel(styles, scripts, modernizr), html, concatTemplate),
+        images,
+        extras
     ),
     cleanUpDist,
+    serviceWorker
 );
 
 function startDistServer() {
@@ -176,10 +259,11 @@ function startAppServer() {
     ]).on('change', server.reload);
 
     watch('app/styles/**/*.scss', styles);
+    watch('modernizr.json', modernizr);
     watch('app/scripts/{,*/}*.js', scripts);
 }
 
-let serve = series(clean, injectBower, parallel(styles, scripts), startAppServer);
+let serve = series(clean, injectBower, parallel(styles, scripts, modernizr), startAppServer);
 exports.serveDist = startDistServer;
 exports.serve = serve;
 exports.build = build;
