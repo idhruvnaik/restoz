@@ -16,19 +16,19 @@ angular.module('clmApp').controller('homeCtrl', ['$scope', '$state', function ($
     hidePreloader();
 
     $(window).on('scroll load', function () {
-        if ($(".navbar").offset().top > 20) {
-            $(".fixed-top").addClass("top-nav-collapse");
+        if ($('.navbar').offset().top > 20) {
+            $('.fixed-top').addClass('top-nav-collapse');
         } else {
-            $(".fixed-top").removeClass("top-nav-collapse");
+            $('.fixed-top').removeClass('top-nav-collapse');
         }
     });
 
-    $(".navbar-nav li a").on("click", function (event) {
+    $('.navbar-nav li a').on('click', function (event) {
         if (!$(this).parent().hasClass('dropdown'))
-            $(".navbar-collapse").collapse('hide');
+            $('.navbar-collapse').collapse('hide');
     });
 
-    $("input, textarea").keyup(function () {
+    $('input, textarea').keyup(function () {
         if ($(this).val() != '') {
             $(this).addClass('notEmpty');
         } else {
@@ -36,11 +36,11 @@ angular.module('clmApp').controller('homeCtrl', ['$scope', '$state', function ($
         }
     });
 
-    $("#js-rotating").Morphext({
+    $('#js-rotating').Morphext({
         // The [in] animation type. Refer to Animate.css for a list of available animations.
-        animation: "fadeIn",
+        animation: 'fadeIn',
         // An array of phrases to rotate are created based on this separator. Change it if you wish to separate the phrases differently (e.g. So Simple | Very Doge | Much Wow | Such Cool).
-        separator: ",",
+        separator: ',',
         // The delay between the changing of each phrase in milliseconds.
         speed: 2000,
         complete: function () {
@@ -56,12 +56,12 @@ angular.module('clmApp').controller('homeCtrl', ['$scope', '$state', function ($
         event.preventDefault();
     });
 
-    $(".navbar-nav li a").on("click", function (event) {
+    $('.navbar-nav li a').on('click', function (event) {
         if (!$(this).parent().hasClass('dropdown'))
-            $(".navbar-collapse").collapse('hide');
+            $('.navbar-collapse').collapse('hide');
     });
 
-    $(".button, a, button").mouseup(function () {
+    $('.button, a, button').mouseup(function () {
         $(this).blur();
     });
 
