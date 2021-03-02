@@ -19,9 +19,34 @@ const del = require('del');
 const workboxBuild = require('workbox-build');
 const server = browserSync.create();
 const { argv } = require('yargs');
+const ngConstant = require('gulp-ng-constant');
 const port = argv.port || 9000;
 
 var isProd = argv.production ? true : false;
+var envSet = {
+    loc: {
+
+    },
+    production: {
+
+    }
+};
+
+function generateENV() {
+    var env = isProd ? envSet.production : envSet.loc;
+    return src('config.json')
+        .pipe(ngConstant({
+            name: 'config',
+            deps: isProd ? ['templates'] : [],
+            constants: {
+                ENV: {
+                   
+                }
+            },
+            wrap: '<%= __ngModule %>'
+        }))
+        .pipe(dest('app/scripts/services/env', { overwrite: true }));
+}
 
 function styles() {
     return src('app/styles/base.scss')
@@ -218,6 +243,7 @@ const build = series(
     injectBower,
     copyJs,
     copyHtml,
+    generateENV,
     parallel(
         lint,
         series(parallel(styles, scripts, modernizr), html, concatTemplate),
@@ -263,7 +289,7 @@ function startAppServer() {
     watch('app/scripts/{,*/}*.js', scripts);
 }
 
-let serve = series(clean, injectBower, parallel(styles, scripts, modernizr), startAppServer);
+let serve = series(clean, injectBower, generateENV, parallel(styles, scripts, modernizr), startAppServer);
 exports.serveDist = startDistServer;
 exports.serve = serve;
 exports.build = build;

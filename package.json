@@ -33,7 +33,8 @@
     "gulp-uglify-es": "^2.0.0",
     "gulp-concat": "^2.6.1",
     "modernizr": "^3.7.1",
-    "workbox-build": "^5.1.3"
+    "workbox-build": "^5.1.3",
+    "gulp-ng-constant": "^1.2.0"
   },
   "scripts": {
     "tasks": "gulp --tasks",
